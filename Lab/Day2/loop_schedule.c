@@ -1,5 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <omp.h>
+
+
 
 void print_usage( int * a, int N, int nthreads ) {
 
@@ -18,8 +21,27 @@ void print_usage( int * a, int N, int nthreads ) {
 }
 
 int main( int argc, char * argv[] ) {
+  
+  int N = 250;
+  int *a  = (int*) malloc(N*sizeof(int));
+  unsigned int i = 0;
+  int thread_id = 0;
+  int n_threads = 1; 
+#pragma omp parallel private(thread_id, i)  
+{
+        n_threads = omp_get_num_threads();
+        thread_id = omp_get_thread_num();
+	
+	#pragma omp for schedule(static,10)	
+	for (i = 0; i < N; i++)
+	{
+	a[i] = thread_id;
+	}
+}
+  print_usage(a, N, n_threads);
+  
+  free(a);
 
-  // TODO                                                                                                                                                                                                                                                                                
 
   return 0;
 }
