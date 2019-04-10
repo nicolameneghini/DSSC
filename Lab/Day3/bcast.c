@@ -1,3 +1,4 @@
+
 /*
  *
  * This code implements the first broadcast operation using the paradigm of message passing (MPI) 
@@ -40,21 +41,23 @@
 
 
 int main( int argc, char * argv[] ){
-
-  int imesg = 0;
+  
+  int msg_size = 256000;
+  int *imesg = (int*)malloc(sizeof(int)*msg_size);
   int rank = 0; // store the MPI identifier of the process
   int npes = 1; // store the number of MPI processes
+  
 
   MPI_Init( &argc, &argv );
   MPI_Comm_rank( MPI_COMM_WORLD, &rank );
   MPI_Comm_size( MPI_COMM_WORLD, &npes );
+  unsigned int i;
+  for (i = 0; i < msg_size; i++)
+          imesg[i] = -npes;
 
-  imesg = rank;
-  fprintf( stderr, "\nBefore Bcast operation I am process %d of %d MPI processes and my message content is: %d\n", rank, npes, imesg );
+  MPI_Bcast( imesg, msg_size, MPI_INT, 0, MPI_COMM_WORLD );
 
-  MPI_Bcast( &imesg, 1, MPI_INT, 0, MPI_COMM_WORLD );
-
-  fprintf( stderr, "\nAfter Bcast operation I am process %d of %d MPI processes and my message content is: %d\n", rank, npes, imesg );
+  fprintf( stderr, "\nAfter Bcast operation I am process %d of %d MPI processes and my message content is: %d\n", rank, npes, imesg[msg_size-1] );
 
   MPI_Finalize();
   
