@@ -34,7 +34,7 @@ int main(){
   int global_nthreads = 0;
   double time;
   double tstart = omp_get_wtime();
-#pragma omp parallel
+#pragma omp parallel reduction(+:global_result)
   {
     double h = (b-a)*1.0/n;
     int tid = omp_get_thread_num();
@@ -43,11 +43,12 @@ int main(){
     int local_n = n/nthreads;
     double local_a = a+ tid*local_n*h;
     double local_b = local_a + local_n*h;
+    double local_result = local_sum(local_a, local_b, local_n, h);
 	
 
-#pragma omp critical
-    global_result +=local_sum(local_a, local_b, local_n, h);
-	
+//#pragma omp critical
+    //global_result +=local_result;
+    global_reuslt += local_sum(local_a, local_b, local_n, h);	
   }
 
   time = omp_get_wtime() -tstart;
