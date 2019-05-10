@@ -1,0 +1,7 @@
+
+identity_matrix.x:8599 terminated with signal 11 at PC=7f942002f0e0 SP=7ffd2c10f890.  Backtrace:
+/u/shared/programs/x86_64/openmpi/1.8.3/gnu/4.9.2/torque/lib/libmpi.so.1(ompi_request_default_wait+0xc0)[0x7f942002f0e0]
+/u/shared/programs/x86_64/openmpi/1.8.3/gnu/4.9.2/torque/lib/libmpi.so.1(MPI_Wait+0x59)[0x7f9420063f69]
+./identity_matrix.x[0x400d2b]
+/lib64/libc.so.6(__libc_start_main+0xfd)[0x355541ed5d]
+./identity_matrix.x[0x400989]
