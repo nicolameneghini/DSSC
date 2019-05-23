@@ -46,15 +46,15 @@ int main(){
     double local_result = local_sum(local_a, local_b, local_n, h);
 	
 
-//#pragma omp critical
-    //global_result +=local_result;
-    global_reuslt += local_sum(local_a, local_b, local_n, h);	
+//#pragma omp critical //#pragma omp atomic
+  //  global_result +=local_result;
+  global_result += local_sum(local_a, local_b, local_n, h)
   }
 
   time = omp_get_wtime() -tstart;
 
   global_result = global_result*4;
 
-  printf("With %d approximated pi is %lf in %lf\n", global_nthreads, global_result, time);
+  printf("%d %lf\n", global_nthreads, time);
   return 0;
 }
