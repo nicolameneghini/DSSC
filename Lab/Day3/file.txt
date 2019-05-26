@@ -1,17 +1,7 @@
-loading dependency gnu/4.9.2
-loading dependency numactl/2.0.10
-loading dependency hwloc/1.10.0
-
-Approx pi is: 3.709181 in time: 14.180000 
-
-Approx pi is: 3.398657 in time: 7.450000 
-
-Approx pi is: 3.267421 in time: 3.800000 
-
-Approx pi is: 3.204195 in time: 2.090000 
-
-Approx pi is: 3.172855 in time: 1.380000 
-
-Approx pi is: 3.166599 in time: 1.170000 
-
-Approx pi is: 3.154093 in time: 0.760000 
+1 14.180000 
+2 7.450000 
+4 3.800000 
+8 2.090000 
+16 1.380000
+20 1.170000 
+40 0.760000 
