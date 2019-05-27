@@ -2,7 +2,7 @@
 
 The program prints an identity matrix of size <a href="https://www.codecogs.com/eqnedit.php?latex=10&space;\times&space;10" target="_blank"><img src="https://latex.codecogs.com/gif.latex?10&space;\times&space;10" title="10 \times 10" /></a> in the terminal window. 
 
-Matrix' rows are evenly distributed between the processes since the rest <a href="https://www.codecogs.com/eqnedit.php?latex=texttt{rest}&space;=&space;\texttt{size}&space;%&space;\texttt{n\_processes}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?texttt{rest}&space;=&space;\texttt{size}&space;%&space;\texttt{n\_processes}" title="texttt{rest} = \texttt{size} % \texttt{n\_processes}" /></a> is spread in such a way to achieve load balance.
+Matrix' rows are evenly distributed between the processes since the rest <a href="https://www.codecogs.com/eqnedit.php?latex=texttt{rest}&space;=&space;\texttt{size}&space;\%&space;\texttt{n\_processes}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?texttt{rest}&space;=&space;\texttt{size}&space;\%&space;\texttt{n\_processes}" title="texttt{rest} = \texttt{size} \% \texttt{n\_processes}" /></a> is spread in such a way to achieve load balance.
 
 The rows of the matrix are sent to the process with rank 0, which will eventually print them.
 
