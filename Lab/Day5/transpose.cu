@@ -2,8 +2,8 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define N 10
-#define N_THREADS 1
+#define N 8192
+#define N_THREADS 64
 #define MAX_ELEM_VALUE 10
 #define CACHE_BLOCK 32
 #define ROWS 8
@@ -31,34 +31,27 @@ __global__ void transpose(float* mat, float *transp){
 
 __global__ void shared_transpose(float* mat, float *transp){
 
- __shared__ float in_cache[CACHE_BLOCK*CACHE_BLOCK + 1];
+    __shared__ double in_cache[CACHE_BLOCK][CACHE_BLOCK];
+    
+    int index_x = blockIdx.x * blockDim.x + threadIdx.x;
+    int index_y = blockIdx.y * blockDim.y + threadIdx.y;
+    
+    in_cache[threadIdx.x][threadIdx.y] = mat[index_x * N + index_y];
+    
+    __syncthreads();
+    
+    transp[index_y * N + index_x] = in_cache[threadIdx.x][threadIdx.y];
 
- int x = blockIdx.x * CACHE_BLOCK + threadIdx.x;
- int y = blockIdx.y * CACHE_BLOCK + threadIdx.y;
- int width = gridDim.x * CACHE_BLOCK;
-
- for(unsigned int i = 0; i < CACHE_BLOCK; i+= ROWS)
-        in_cache[(threadIdx.y+i)*CACHE_BLOCK + threadIdx.x] = mat[x + (y+i)*width];
-
- __syncthreads();
-
- x = blockIdx.x * CACHE_BLOCK + threadIdx.x;
- y = blockIdx.y * CACHE_BLOCK + threadIdx.y;
-
- for(unsigned int j = 0; j < CACHE_BLOCK; j+= ROWS)
-         transp[x + (y+j)*width] = in_cache[threadIdx.x + CACHE_BLOCK*(threadIdx.y+j)];
 }
 
-v
 
-
-void print_mat(int* mat){
+void print_mat(float* mat){
 
  int i, j;
 
  for(i = 0; i < N; i++){
     for(j = 0; j < N; j++)
-     printf("%d ",mat[i*N + j]);
+     printf("%f ",mat[i*N + j]);
 
     printf("\n");
   }
@@ -104,7 +97,7 @@ int main(void){
  cudaEvent_t start, stop;
  dim3 grid, block;
  block.x = CACHE_BLOCK;
- block.y = ROWS;
+ block.y = CACHE_BLOCK;
  grid.x = N/CACHE_BLOCK;
  grid.y = N/CACHE_BLOCK;
 
@@ -119,7 +112,7 @@ int main(void){
 
 
  randomly_fill_matrix(mat);
- print_mat(mat);
+ //print_mat(mat);
 
  normal_transpose(mat, test_mat);
 
@@ -138,26 +131,28 @@ int main(void){
 
 
  cudaEventSynchronize(stop);
- float time_naive = 0;
- cudaEventElapsedTime(&time_naive, start, stop);
+ float time = 0;
+ cudaEventElapsedTime(&time, start, stop);
 
  cudaMemcpy(transp1, dev_transp1, size, cudaMemcpyDeviceToHost);
 
  if(test(transp1, test_mat)) printf("correct1\n");
  else printf("not correct1\n");
+ int n_threads = N_THREADS; 
+ printf("With %d threads time for naive transpose is %fms\n", n_threads, time);
 
  free(transp1); cudaFree(dev_transp1);
 
  //-------------//
 
  cudaEventRecord(start);
- shared_transpose<<< grid,block >>>(dev_mat, dev_transp2);
+ shared_transpose<<< grid , block >>>(dev_mat, dev_transp2);
  cudaEventRecord(stop);
 
 
  cudaEventSynchronize(stop);
- float time_shared = 0;
- cudaEventElapsedTime(&time_shared, start, stop);
+ time = 0;
+ cudaEventElapsedTime(&time, start, stop);
 
  cudaMemcpy(transp2, dev_transp2, size, cudaMemcpyDeviceToHost);
 
@@ -168,9 +163,8 @@ int main(void){
  //-------------//
 
 
- print_mat(transp2);
- int n_threads = N_THREADS;
- printf("with %d threads time for a naive transpose is %fms while in shared memory is %fms\n", n_threads, time_naive, time_shared);
+ //print_mat(transp2);
+ printf("time in shared memory is %fms\n", n_threads, time);
 
  free(mat); cudaFree(dev_mat);
 
