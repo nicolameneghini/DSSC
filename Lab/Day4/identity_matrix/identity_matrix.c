@@ -3,15 +3,25 @@
 #include <stdio.h>
 #include <time.h>
 
-#define N 10
+#define N 20
 
- print_mat(int*mat, int n_block){
+void print_mat(int*mat, int n_block){
  unsigned int i,j;
  for(i = 0; i < n_block; i++){
    for(j = 0; j < N; j++)
      printf("%d ", mat[i*N+j]);
   printf("\n");
  }
+}
+
+void print_mat_file(int*mat, int n_block, FILE*outfile){
+ unsigned int i, j;
+ for (i = 0; i < n_block; i++){
+   for(j = 0; j< N; j++)
+     fprintf(outfile, "%d ", mat[i*N+j]);
+   fprintf(outfile, "\n");	 
+ }
+
 }
 
 
@@ -22,13 +32,14 @@ int main(int argc, char* argv[]){
  MPI_Comm_rank( MPI_COMM_WORLD, &rank );
  MPI_Comm_size( MPI_COMM_WORLD, &npes );	
  int i, j, i_global;
-
+ 
  int *mat=(int *)malloc(sizeof(int)*N*N);
  //for (i=0; i<N; i++)  mat[i]=(int *)malloc(sizeof(int)*N);
 		   
  int n_block = N/npes;
  int rest = N%npes;
- 
+ FILE*outfile;
+ outfile = fopen("identity_file.txt","w");
  if(rest != 0 && rank < rest)
 	 n_block ++;
 
@@ -46,12 +57,19 @@ int main(int argc, char* argv[]){
  
 
  if(rank==0){
-  print_mat(mat, n_block);
+
+  if(N<= 10)
+   print_mat(mat, n_block);
+  else
+    print_mat_file(mat, n_block, outfile);
   //printf("end of process %d \n", rank);
   for ( i = 1; i <npes; i++){
-    MPI_Recv(&n_block,1,MPI_INT, i, 102, MPI_COMM_WORLD, MPI_STATUS_IGNORE);	  
-    MPI_Recv(mat, n_block*N, MPI_INT, i, 101, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    print_mat(mat, n_block);
+      MPI_Recv(&n_block,1,MPI_INT, i, 102, MPI_COMM_WORLD, MPI_STATUS_IGNORE);	  
+      MPI_Recv(mat, n_block*N, MPI_INT, i, 101, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      if(N <= 10)
+       print_mat(mat, n_block);
+      else
+       print_mat_file(mat, n_block, outfile);
     //printf("end of process %d \n", rank);
   }
 }
