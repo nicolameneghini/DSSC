@@ -3,9 +3,9 @@
 #include <stdlib.h>
 
 #define N 8192
-#define N_THREADS 64
+#define N_THREADS 1024
 #define MAX_ELEM_VALUE 10
-#define CACHE_BLOCK 32
+#define BLOCK 32
 #define ROWS 8
 
 __global__ void transpose(float* mat, float *transp){
@@ -31,16 +31,16 @@ __global__ void transpose(float* mat, float *transp){
 
 __global__ void shared_transpose(float* mat, float *transp){
 
-    __shared__ double in_cache[CACHE_BLOCK][CACHE_BLOCK];
+    __shared__ double in_cache[BLOCK][BLOCK+1];
     
     int index_x = blockIdx.x * blockDim.x + threadIdx.x;
     int index_y = blockIdx.y * blockDim.y + threadIdx.y;
     
-    in_cache[threadIdx.x][threadIdx.y] = mat[index_x * N + index_y];
+    in_cache[threadIdx.x][threadIdx.y] = mat[index_y * N + index_x];
     
     __syncthreads();
     
-    transp[index_y * N + index_x] = in_cache[threadIdx.x][threadIdx.y];
+    transp[index_x * N + index_y] = in_cache[threadIdx.x][threadIdx.y];
 
 }
 
@@ -96,10 +96,10 @@ int main(void){
  int size = N*N*sizeof(double);
  cudaEvent_t start, stop;
  dim3 grid, block;
- block.x = CACHE_BLOCK;
- block.y = CACHE_BLOCK;
- grid.x = N/CACHE_BLOCK;
- grid.y = N/CACHE_BLOCK;
+ block.x = BLOCK;
+ block.y = BLOCK;
+ grid.x = N/BLOCK;
+ grid.y = N/BLOCK;
 
  cudaMalloc( (void**)&dev_mat, size );
  cudaMalloc( (void**)&dev_transp1, size );
