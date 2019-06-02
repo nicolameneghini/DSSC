@@ -2,44 +2,36 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define N 8192
-#define N_THREADS 1024
+
 #define MAX_ELEM_VALUE 10
-#define BLOCK 32
-#define ROWS 8
+
+#define N 8192
+#define BLOCK_X 32
+#define BLOCK_Y 32
+
+int n_threads = 1024;
+
 
 __global__ void transpose(float* mat, float *transp){
 
-
- //int y = blockIdx.x;
- //int x = threadIdx.x;
-
- //while(x < N){
-  //transp[y*N + x] = mat[x*N + y];
-  //x += blockDim.x;
- //}
-
-
-  //transp[y*N + x] = mat[x*N + y];
-  //x += blockDim.x;
- //}
  int index = threadIdx.x + blockIdx.x*blockDim.x;
  int x = index%N;
  int y = index/N;
  transp[y*N+x] = mat[x*N+y];
+
 }
 
 __global__ void shared_transpose(float* mat, float *transp){
 
-    __shared__ double in_cache[BLOCK][BLOCK+1];
-    
+    __shared__ double in_cache[BLOCK_X][BLOCK_Y+1];
+
     int index_x = blockIdx.x * blockDim.x + threadIdx.x;
     int index_y = blockIdx.y * blockDim.y + threadIdx.y;
-    
+
     in_cache[threadIdx.x][threadIdx.y] = mat[index_y * N + index_x];
-    
+
     __syncthreads();
-    
+
     transp[index_x * N + index_y] = in_cache[threadIdx.x][threadIdx.y];
 
 }
@@ -56,6 +48,7 @@ void print_mat(float* mat){
     printf("\n");
   }
 }
+
 
 void randomly_fill_matrix(float *A)
 {
@@ -88,7 +81,7 @@ int test(float *a, float *b)
 
    return 1;
 }
-
+ 
 int main(void){
 
  float *mat, *transp1, *transp2, *test_mat;
@@ -96,10 +89,10 @@ int main(void){
  int size = N*N*sizeof(double);
  cudaEvent_t start, stop;
  dim3 grid, block;
- block.x = BLOCK;
- block.y = BLOCK;
- grid.x = N/BLOCK;
- grid.y = N/BLOCK;
+ block.x = BLOCK_X;
+ block.y = BLOCK_Y;
+ grid.x = N/BLOCK_X;
+ grid.y = N/BLOCK_Y;
 
  cudaMalloc( (void**)&dev_mat, size );
  cudaMalloc( (void**)&dev_transp1, size );
@@ -116,7 +109,6 @@ int main(void){
 
  normal_transpose(mat, test_mat);
 
-
  //----------//
  cudaEventCreate(&start);
  cudaEventCreate(&stop);
@@ -125,10 +117,8 @@ int main(void){
 
  //-------------//
  cudaEventRecord(start);
- transpose<<< (N*N)/N_THREADS, N_THREADS >>>(dev_mat, dev_transp1);
+ transpose<<< (N*N)/n_threads, n_threads  >>>(dev_mat, dev_transp1);
  cudaEventRecord(stop);
-
-
 
  cudaEventSynchronize(stop);
  float time = 0;
@@ -136,12 +126,7 @@ int main(void){
 
  cudaMemcpy(transp1, dev_transp1, size, cudaMemcpyDeviceToHost);
 
- if(test(transp1, test_mat)) printf("correct1\n");
- else printf("not correct1\n");
- int n_threads = N_THREADS; 
- printf("With %d threads time for naive transpose is %fms\n", n_threads, time);
-
- free(transp1); cudaFree(dev_transp1);
+ printf("%d %f ", n_threads, time);
 
  //-------------//
 
@@ -156,16 +141,18 @@ int main(void){
 
  cudaMemcpy(transp2, dev_transp2, size, cudaMemcpyDeviceToHost);
 
- if(test(transp2, test_mat)) printf("correct2\n");
- else printf("not correct2\n");
+ printf("%f ", n_threads, time);
 
- free(transp2); cudaFree(dev_transp2);
+ if(test(transp1, test_mat)) printf("correct naive ");
+ else printf("not correct naive ");
+
+ if(test(transp2, test_mat)) printf("correct shared\n");
+ else printf("not correct shared\n");
+
  //-------------//
 
-
- //print_mat(transp2);
- printf("time in shared memory is %fms\n", n_threads, time);
-
+ free(transp1); cudaFree(dev_transp1);
+ free(transp2); cudaFree(dev_transp2);
  free(mat); cudaFree(dev_mat);
 
 return 0;
