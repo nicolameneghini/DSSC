@@ -2,6 +2,6 @@
 32 34.468384 23.918016  correct naive correct shared 
 64 31.059521 9.833536  correct naive correct shared 
 128 26.690559 10.123200  correct naive correct shared 
-256 25.708992 10.554400  correct naive correct shared 
+256 25.708992 7.554400  correct naive correct shared 
 512 25.907295 10.921344  correct naive correct shared 
 1024 24.284479 13.008032  correct naive correct shared 
