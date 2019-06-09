@@ -1,6 +1,6 @@
 ### Exercise 1 - Identity Matrix
 
-The program prints an identity matrix of size <a href="https://www.codecogs.com/eqnedit.php?latex=10&space;\times&space;10" target="_blank"><img src="https://latex.codecogs.com/gif.latex?10&space;\times&space;10" title="10 \times 10" /></a> in the terminal window. 
+The program prints an identity matrix of size <a href="https://www.codecogs.com/eqnedit.php?latex=10&space;\times&space;10" target="_blank"><img src="https://latex.codecogs.com/gif.latex?10&space;\times&space;10" title="10 \times 10" /></a> in the terminal window (if the size of the matrix is > 10, the matrix is printed on a outfile)
 
 Matrix' rows are evenly distributed between the processes since the rest <a href="https://www.codecogs.com/eqnedit.php?latex=\texttt{rest}&space;=&space;\texttt{size}&space;\%&space;\texttt{n\_processes}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\texttt{rest}&space;=&space;\texttt{size}&space;\%&space;\texttt{n\_processes}" title="\texttt{rest} = \texttt{size} \% \texttt{n\_processes}" /></a> is spread in such a way to achieve load balance.
 
