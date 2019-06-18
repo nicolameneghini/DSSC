@@ -23,16 +23,16 @@ __global__ void transpose(float* mat, float *transp){
 
 __global__ void shared_transpose(float* mat, float *transp){
 
-    __shared__ double in_cache[BLOCK_X][BLOCK_Y+1];
+    __shared__ double temp[BLOCK_X][BLOCK_Y+1];
 
     int index_x = blockIdx.x * blockDim.x + threadIdx.x;
     int index_y = blockIdx.y * blockDim.y + threadIdx.y;
 
-    in_cache[threadIdx.x][threadIdx.y] = mat[index_y * N + index_x];
+    temp[threadIdx.x][threadIdx.y] = mat[index_y * N + index_x];
 
     __syncthreads();
 
-    transp[index_x * N + index_y] = in_cache[threadIdx.x][threadIdx.y];
+    transp[index_x * N + index_y] = temp[threadIdx.x][threadIdx.y];
 
 }
 

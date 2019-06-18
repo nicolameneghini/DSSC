@@ -1,8 +1,0 @@
-correct1
-With 32 threads time for naive transpose is 34.133888ms
-correct2
-time in shared memory is 32.424290ms
-correct1
-With 64 threads time for naive transpose is 30.574816ms
-correct2
-time in shared memory is 32.432896ms
