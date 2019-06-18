@@ -64,28 +64,6 @@ int main(int argc, char* argv[]){
    }
  }
 
- if(N <= 10){
-   
-   if(rank == 0){
-      
-       print_mat(mat, n_block);
-       
-       for ( i = 1; i <npes; i++){
-         MPI_Recv(&n_block,1,MPI_INT, i, 102, MPI_COMM_WORLD, MPI_STATUS_IGNORE);	  
-         MPI_Recv(mat, n_block*N, MPI_INT, i, 101, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-         print_mat(mat, n_block);
-     }
-   }
-   else{
-       MPI_Send(mat, n_block*N, MPI_INT, 0 , 101, MPI_COMM_WORLD);
-       MPI_Send(&n_block, 1, MPI_INT, 0, 102, MPI_COMM_WORLD);
-   }
-	
-   
-  
-}
-
-  else{
 
     if(rank ==0){
       
@@ -122,7 +100,6 @@ int main(int argc, char* argv[]){
    } 
 
  
-  }
  free(mat);
  MPI_Finalize();
 

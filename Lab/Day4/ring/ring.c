@@ -4,7 +4,7 @@
 #include <math.h>
 #include <mpi.h>
 
-#define N 100
+#define N 4
 
 void swap(int**a, int**b)
 { 
@@ -12,7 +12,6 @@ void swap(int**a, int**b)
   *a = *b;
   *b = tmp;
 }
-
 
 int main(int argc, char* argv[]){
 
@@ -33,25 +32,42 @@ int main(int argc, char* argv[]){
  int *receive = (int*)calloc(sizeof(int),N);
  int *sum = (int*)calloc(sizeof(int),N);
  
- for(i = 0; i < N; i++) message[i] = rank;
- 
- 
- for(i = 0; i <last; i++){
-   	 
-   MPI_Isend(message,N,MPI_INT, (rank+1)%npes, 101,MPI_COMM_WORLD, &request);
-   
-   for(j = 0; j < N; j++) sum[j] += message[j] ;
-   
-   MPI_Recv(receive,N,MPI_INT, (rank-1+npes)%npes, 101, MPI_COMM_WORLD,  MPI_STATUS_IGNORE);
-   MPI_Wait(&request, &status);
-   swap(&receive, &message);
-   //for(j = 0; j < N; j++) sum[j] = receive[j];
+ for(i = 0; i < N; i++) {
+    message[i] = rank;
+    sum[i] = message[i];
  }
- 
- fprintf( stderr, "I am process %d and my message is %d \n", rank, sum[0]);
- 
- MPI_Barrier(MPI_COMM_WORLD);
- 
+
+ for(i = 0; i <last; i++){
+  
+   if(rank!=0){
+
+    MPI_Recv(receive,N,MPI_INT, (rank-1+npes)%npes, 101, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+    MPI_Send(message,N,MPI_INT, (rank+1)%npes, 101,MPI_COMM_WORLD);
+    
+    for(i = 0; i < N; i++)
+       sum[i]+=message[i];
+   
+    swap(&receive, &message);
+    }
+    else{
+     
+     MPI_Send(message,N,MPI_INT, (rank+1)%npes, 101,MPI_COMM_WORLD);
+     MPI_Recv(receive,N,MPI_INT, (rank-1+npes)%npes, 101, MPI_COMM_WORLD,  MPI_STATUS_IGNORE);
+
+     for(i = 0; i < N; i++)
+        sum[i]+=message[i];
+    
+     swap(&receive, &message);
+
+    }
+
+  }
+
+  fprintf( stderr, "I am process %d and my message is %d \n", rank, sum[0]);
+
+  MPI_Barrier(MPI_COMM_WORLD);
+
+
  free(message);
  free(receive);
  free(sum); 
