@@ -6,6 +6,8 @@ Matrix' rows are evenly distributed between the processes since the rest <a href
 
 The rows of the matrix are sent to the process with rank <a href="https://www.codecogs.com/eqnedit.php?latex=0" target="_blank"><img src="https://latex.codecogs.com/gif.latex?0" title="0" /></a>, which will eventually print them.
 
+The exercise is implemented in two versions: blocking and non-blocking.
+
 ### Exercise 2 - Ring
 
 A vectorial sum is performed through all the process, meaning that each process of rank <a href="https://www.codecogs.com/eqnedit.php?latex=i" target="_blank"><img src="https://latex.codecogs.com/gif.latex?i" title="i" /></a> sends a message to the one with rank <a href="https://www.codecogs.com/eqnedit.php?latex=i&plus;1" target="_blank"><img src="https://latex.codecogs.com/gif.latex?i&plus;1" title="i+1" /></a>. This is done in an overlapping fashion, that is <a href="https://www.codecogs.com/eqnedit.php?latex=\texttt{MPI\_Isend()}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\texttt{MPI\_Isend()}" title="\texttt{MPI\_Isend()}" /></a>
