@@ -32,7 +32,7 @@ int main()
   int global_nthreads = 0;
   double time;
   double tstart = omp_get_wtime();
-  1
+  #pragma omp parallel reduction(+:global_result)
   {
     double h = (b - a) * 1.0 / n;
     int tid = omp_get_thread_num();
