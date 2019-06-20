@@ -49,7 +49,7 @@ int main(int argc, char* argv[]){
  int n_block = N/npes;
  int rest = N%npes;
  if(rest != 0 && rank < rest)
-	 n_block ++;
+	 n_block ++; //distributing the rest across the blocks
 
 
  for (i = 0; i < n_block; i++){
@@ -74,7 +74,7 @@ int main(int argc, char* argv[]){
       outfile = fopen("identity_overlapping.txt","w");
       
       int*write_buff = mat;    
-      int*recv_buff = (int*)malloc(n_block*sizeof(int));
+      int*recv_buff = (int*)malloc(N*n_block*sizeof(int));
       
       MPI_Irecv(recv_buff, n_block*N, MPI_INT, 1, 101, MPI_COMM_WORLD, &request);
       print_mat_file(write_buff, n_block, outfile);
