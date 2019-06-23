@@ -45,7 +45,7 @@ int main(int argc, char* argv[]){
     MPI_Send(message,N,MPI_INT, (rank+1)%npes, 101,MPI_COMM_WORLD);
     
     for(i = 0; i < N; i++)
-       sum[i]+=message[i];
+       sum[i]+=receive[i];
    
     swap(&receive, &message);
     }
@@ -55,7 +55,7 @@ int main(int argc, char* argv[]){
      MPI_Recv(receive,N,MPI_INT, (rank-1+npes)%npes, 101, MPI_COMM_WORLD,  MPI_STATUS_IGNORE);
 
      for(i = 0; i < N; i++)
-        sum[i]+=message[i];
+        sum[i]+=receive[i];
     
      swap(&receive, &message);
 
